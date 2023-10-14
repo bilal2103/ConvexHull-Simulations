@@ -41,6 +41,19 @@ def Generate_Points():
 def Add_Line(p1, p2, c, color):
     return c.create_line(p1.x, p1.y, p2.x, p2.y, fill=color)
 
+class MainMenu:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.DisplayMenu()
+    def DisplayJarvis(self):
+        self.root.destroy()
+        obj.JarvisMarch()
+    def DisplayMenu(self):
+        self.root.geometry("900x900")
+        self.root.title("Main Menu")
+        jarvis_btn = tk.Button(self.root,text="Simulate Jarvis March", font=('Comic Sans',18),command=self.DisplayJarvis)
+        jarvis_btn.pack()
+        self.root.mainloop()
 
 class ConvexHull:
     Hull = []
@@ -57,12 +70,16 @@ class ConvexHull:
         print('Displaying points that are part of the hull')
         for point in self.Hull:
             print(str(point.x) + ',' + str(point.y))
+
     def JarvisMarch(self):
         def proceed():
             result_var.set(False)
-
+        def CloseWindow():
+            root.destroy()
+            MainMenu()
         root = tk.Tk()
         root.geometry(f"{self.screenheight}x{self.screenwidth}")
+        root.protocol("WM_DELETE_WINDOW", CloseWindow)
         result_var = tk.BooleanVar()
         root.configure(bg="Black")
         root.title('Jarvis March')
@@ -124,8 +141,9 @@ class ConvexHull:
 
 
 
+
 points = []
 Generate_Points()
 obj = ConvexHull(points)
-obj.JarvisMarch()
-obj.display_Hull()
+Main = MainMenu()
+
