@@ -34,8 +34,8 @@ def left_most() -> int:                 #function for finding leftmost point
     return minn                 #
 def Generate_Points():                      #Function to generate random points
     while len(points) < 10:
-        x = random.randint(0, 9)
-        y = random.randint(0, 9)
+        x = random.randint(0, 20)
+        y = random.randint(0, 20)
         point = Point(x, y)
         is_unique = all((point.x != p.x or point.y != p.y) for p in points)
         if is_unique:
@@ -61,6 +61,9 @@ class MainMenu:         #for the functionalities of main screen...
     def DisplayQuickElimination(self):
         self.root.destroy()
         self.obj.QuickElimination()
+    def DisplayChans(self):
+        self.root.destroy()
+        self.obj.Chans()
     def CloseWindow(self):
         self.root.destroy()
         self.obj.root.destroy()
@@ -82,12 +85,14 @@ class MainMenu:         #for the functionalities of main screen...
         bruteforce_btn = tk.Button(self.root, text="Simulate Brute Force approach", font=('Comic Sans', 18),command=self.DisplayBruteForce)
 
         quickelm_btn = tk.Button(self.root,text="Simulate Quick Elimination", font=('Comic Sans', 18),command=self.DisplayQuickElimination)
+        chans_btn = tk.Button(self.root,text="Simulate Chan's Algorithm",font=('Comic Sans', 18),command=self.DisplayChans)
         title_lbl.pack()
         lbl1.pack(padx=20,pady=70,anchor="w")
         bruteforce_btn.pack(padx=20, pady=10, anchor="w")
         jarvis_btn.pack(padx=20,pady=10,anchor="w")
         graham_btn.pack(padx=20,pady=10,anchor="w")
         quickelm_btn.pack(padx=20, pady=10, anchor="w")
+        chans_btn.pack(padx=20, pady=10, anchor="w")
         self.root.mainloop()
 
 class ConvexHull:
@@ -98,7 +103,7 @@ class ConvexHull:
     def __init__(self, p):
         self.Points = p
         self.circle_radius = 10
-        self.start = Point(300,500)
+        self.start = Point(200,500)
         self.screenheight = 700
         self.screenwidth = 700
         self.root = tk.Tk()
@@ -174,8 +179,8 @@ class ConvexHull:
         origin = self.Points[left_most()]
         for point in self.Points:
             temp = Point(point.x, point.y)
-            temp.x = abs(origin.x - temp.x) * 30 + self.start.x
-            temp.y = self.start.y - abs(origin.x + temp.y) * 30
+            temp.x = abs(origin.x - temp.x) * 20 + self.start.x
+            temp.y = self.start.y - abs(origin.x + temp.y) * 20
             self.updated_points[point] = temp
             c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="red")
             coordinates = tk.Label(c, text=f"{point.x},{point.y}", font=('Comic Sans', 5), bg="black", fg="white")
@@ -183,6 +188,14 @@ class ConvexHull:
         c.pack()
         return c
 
+   
+    def Chans(self):
+        k = 2
+        c = self.InitializeWindow("Chans Algorithm","Simulation for Chan's Algorithm")
+
+
+        c.pack()
+        self.root.mainloop()
     def BruteForce(self):
         n = len(self.Points)
         c = self.InitializeWindow("Brute Force","Simulation for brute force approach")
