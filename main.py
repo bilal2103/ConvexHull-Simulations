@@ -116,30 +116,10 @@ class ConvexHull:
     def proceed(self):
         self.result_var.set(True)
     def JarvisMarch(self):
-        self.root.deiconify()           #open the window back
-        self.root.geometry(f"{self.screenheight}x{self.screenwidth}")   #set width and height of screen
-        self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)  #To go back to main menu after we're done
-        self.root.configure(bg="Black")
-        self.root.title('Jarvis March')
-
-        c = tk.Canvas(self.root, bg="black", height=self.screenheight, width=self.screenwidth)
-        title_label = tk.Label(c,text="Simulation for Jarvis March Algorithm",font=('Comic Sans',15), bg="black", fg="white")
-        c.create_window(350,20,window=title_label,anchor="center")      #create a window for label on canvas
-        origin_index = left_most()                                      #find the left most point to start jarvis march
-        origin = self.Points[origin_index]
-        for point in self.Points:
-            temp = Point(point.x, point.y)
-            temp.x = abs(origin.x - temp.x) * 30 + self.start.x
-            temp.y = self.start.y - abs(origin.x + temp.y) * 30         # calculating absolute distance from the origin.
-            self.updated_points[point] = temp                           # did this through trial and error, finding appropriate place
-                                                                        # to print points on the screen
-            c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="red")
-            coordinates = tk.Label(c, text=f"{point.x},{point.y}", font=('Comic Sans', 5), bg="black", fg="white")
-            label_window = c.create_window(temp.x, temp.y - 5, window=coordinates)
-
+        c = self.InitializeWindow("Jarvis March", "Simulation for Jarvis March algorithm")
         # perform Jarvis March
         n = len(self.Points)
-        l = origin_index
+        l = left_most()
         p = l
         q = 0
 
@@ -175,37 +155,18 @@ class ConvexHull:
                 break
         c.pack()
         self.root.mainloop()
-    '''
-    write your code in the function below aimon, btw deiconify is used to open the screen again which was initially put to sleep
-    in the constructor using root.withdraw()...
-    '''
+
     def GrahamScan(self):
-        self.root.deiconify()
-        self.root.geometry(f"{self.screenwidth}x{self.screenheight}")
-        self.root.title("Graham Scan")
-        c = tk.Canvas(self.root,width=700,height=700,bg="Black")
-        title_label = tk.Label(c, text="Simulation for Graham Scan Algorithm", font=('Comic Sans', 15), bg="black",fg="white")
-        c.create_window(350, 20, window=title_label, anchor="center")
-        self.root.protocol("WM_DELETE_WINDOW",self.CloseWindow)
-        origin = self.Points[left_most()]
-        for point in self.Points:
-            temp = Point(point.x, point.y)
-            temp.x = abs(origin.x - temp.x) * 30 + self.start.x
-            temp.y = self.start.y - abs(origin.x + temp.y) * 30
-            self.updated_points[point] = temp
-            c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="red")
-            coordinates = tk.Label(c, text=f"{point.x},{point.y}", font=('Comic Sans', 5), bg="black", fg="white")
-            label_window = c.create_window(temp.x, temp.y - 5, window=coordinates)
+        c = self.InitializeWindow("Graham Scan","Simulation for Graham scan algorithm")
         n = len(self.Points)
         c.pack()
         self.root.mainloop()
-    def BruteForce(self):
+    def InitializeWindow(self,title,text):
         self.root.deiconify()
         self.root.geometry(f"{self.screenwidth}x{self.screenheight}")
-        self.root.title("Brute Force")
+        self.root.title(title)
         c = tk.Canvas(self.root, width=self.screenwidth, height=self.screenheight, bg="Black")
-        title_label = tk.Label(c, text="Simulation for Brute force approach", font=('Comic Sans', 15), bg="black",
-                               fg="white")
+        title_label = tk.Label(c, text=text, font=('Comic Sans', 15), bg="black",fg="white")
         c.create_window(350, 20, window=title_label, anchor="center")
         self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
         origin = self.Points[left_most()]
@@ -217,8 +178,12 @@ class ConvexHull:
             c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="red")
             coordinates = tk.Label(c, text=f"{point.x},{point.y}", font=('Comic Sans', 5), bg="black", fg="white")
             label_window = c.create_window(temp.x, temp.y - 5, window=coordinates)
-        n = len(self.Points)
         c.pack()
+        return c
+
+    def BruteForce(self):
+        n = len(self.Points)
+        c = self.InitializeWindow("Brute Force","Simulation for brute force approach")
         #Perform brute force
         for i in range(n):
             for j in range(n):
@@ -245,23 +210,7 @@ class ConvexHull:
         self.root.mainloop()
 
     def QuickElimination(self):
-        self.root.deiconify()
-        self.root.geometry(f"{self.screenwidth}x{self.screenheight}")
-        self.root.title("Quick Elimination")
-        c = tk.Canvas(self.root, width=self.screenwidth, height=self.screenheight, bg="Black")
-        title_label = tk.Label(c, text="Simulation for Quick Elimination", font=('Comic Sans', 15), bg="black",
-                               fg="white")
-        c.create_window(350, 20, window=title_label, anchor="center")
-        self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
-        origin = self.Points[left_most()]
-        for point in self.Points:
-            temp = Point(point.x, point.y)
-            temp.x = abs(origin.x - temp.x) * 30 + self.start.x
-            temp.y = self.start.y - abs(origin.x + temp.y) * 30
-            self.updated_points[point] = temp
-            c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="red")
-            coordinates = tk.Label(c, text=f"{point.x},{point.y}", font=('Comic Sans', 5), bg="black", fg="white")
-            label_window = c.create_window(temp.x, temp.y - 5, window=coordinates)
+        c = self.InitializeWindow("Quick elimination", "Simulation for Quick Elimination algorithm")
         n = len(self.Points)
         c.pack()
         self.root.mainloop()
