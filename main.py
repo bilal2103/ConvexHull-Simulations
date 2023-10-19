@@ -18,10 +18,12 @@ def orientation(p, q, r):
         return 1
     else:
         return 2
-
+def CheckLine(lineEndptA, lineEndptB, ptSubject):       #For brute force method, checking which side of the line do points lie on
+    return (ptSubject.x - lineEndptA.x) * (lineEndptB.y - lineEndptA.y) - (ptSubject.y - lineEndptA.y) * (
+                lineEndptB.x - lineEndptA.x)
 def distance(p, q):
     return mp.sqrt((p.x - q.x) ** 2 + (p.y - q.y) ** 2)
-def left_most() -> int:
+def left_most() -> int:                 #function for finding leftmost point
     minn = 0
     for i in range(1, len(points)):
         if points[i].x < points[minn].x:
@@ -29,8 +31,8 @@ def left_most() -> int:
         elif points[i].x == points[minn].x:
             if points[i].y > points[minn].y:
                 minn = i
-    return minn
-def Generate_Points():
+    return minn                 #
+def Generate_Points():                      #Function to generate random points
     while len(points) < 10:
         x = random.randint(0, 9)
         y = random.randint(0, 9)
@@ -41,9 +43,10 @@ def Generate_Points():
 def Add_Line(p1, p2, c, color):
     return c.create_line(p1.x, p1.y, p2.x, p2.y, fill=color)
 
-class MainMenu:
+class MainMenu:         #for the functionalities of main screen...
     def __init__(self):
         self.root = tk.Tk()
+        Generate_Points()
         self.obj = ConvexHull(points)
         self.DisplayMenu()
     def DisplayJarvis(self):
@@ -85,7 +88,7 @@ class MainMenu:
 class ConvexHull:
     Hull = []
     Points = []
-    updated_points = {}
+    updated_points = {}         #Hashmap that maps points to appropriate coordinates on the screen
 
     def __init__(self, p):
         self.Points = p
@@ -94,6 +97,8 @@ class ConvexHull:
         self.screenheight = 700
         self.screenwidth = 700
         self.root = tk.Tk()
+        self.result_var = tk.BooleanVar(self.root)
+        self.simulation_speed = 100             #Change this so that program runs faster/slower.
         self.root.withdraw()
     def display_Hull(self):
         print('Displaying points that are part of the hull')
@@ -102,26 +107,27 @@ class ConvexHull:
     def CloseWindow(self):
         self.root.destroy()
         MainMenu()
-    def JarvisMarch(self):
-        def proceed():
-            result_var.set(False)
 
-        self.root.deiconify()
-        self.root.geometry(f"{self.screenheight}x{self.screenwidth}")
-        self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
-        result_var = tk.BooleanVar()
+    def proceed(self):
+        self.result_var.set(True)
+    def JarvisMarch(self):
+        self.root.deiconify()           #open the window back
+        self.root.geometry(f"{self.screenheight}x{self.screenwidth}")   #set width and height of screen
+        self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)  #To go back to main menu after we're done
         self.root.configure(bg="Black")
         self.root.title('Jarvis March')
-        c = tk.Canvas(self.root, bg="black", height=700, width=700)
+
+        c = tk.Canvas(self.root, bg="black", height=self.screenheight, width=self.screenwidth)
         title_label = tk.Label(c,text="Simulation for Jarvis March Algorithm",font=('Comic Sans',15), bg="black", fg="white")
-        c.create_window(350,20,window=title_label,anchor="center")
-        origin_index = left_most()
+        c.create_window(350,20,window=title_label,anchor="center")      #create a window for label on canvas
+        origin_index = left_most()                                      #find the left most point to start jarvis march
         origin = self.Points[origin_index]
         for point in self.Points:
             temp = Point(point.x, point.y)
             temp.x = abs(origin.x - temp.x) * 30 + self.start.x
-            temp.y = self.start.y - abs(origin.x + temp.y) * 30
-            self.updated_points[point] = temp
+            temp.y = self.start.y - abs(origin.x + temp.y) * 30         # calculating absolute distance from the origin.
+            self.updated_points[point] = temp                           # did this through trial and error, finding appropriate place
+                                                                        # to print points on the screen
             c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="red")
             coordinates = tk.Label(c, text=f"{point.x},{point.y}", font=('Comic Sans', 5), bg="black", fg="white")
             label_window = c.create_window(temp.x, temp.y - 5, window=coordinates)
@@ -131,7 +137,7 @@ class ConvexHull:
         l = origin_index
         p = l
         q = 0
-        simulation_speed = 500
+
         while True:
             self.Hull.append(self.Points[p])
             q = (p + 1) % n
@@ -140,15 +146,15 @@ class ConvexHull:
             for i in range(n):
                 if p == i or q == i or p == i:
                     continue
-                result_var.set(False)
-                self.root.after(simulation_speed, proceed)
-                self.root.wait_variable(result_var)
+                self.result_var.set(False)                              #To pause the execution for some time
+                self.root.after(self.simulation_speed, self.proceed)    #to call proceed() function after some time
+                self.root.wait_variable(self.result_var)                #Waiting...
                 line_id2 = Add_Line(self.updated_points[self.Points[q]], self.updated_points[self.Points[i]], c,
                                     "purple")
                 c.pack()
-                result_var.set(False)
-                self.root.after(simulation_speed, proceed)
-                self.root.wait_variable(result_var)
+                self.result_var.set(False)
+                self.root.after(self.simulation_speed, self.proceed)
+                self.root.wait_variable(self.result_var)
                 o = orientation(self.Points[p], self.Points[i], self.Points[q])
                 if o == 2:
                     c.delete(line_id)
@@ -182,7 +188,7 @@ class ConvexHull:
         self.root.deiconify()
         self.root.geometry(f"{self.screenwidth}x{self.screenheight}")
         self.root.title("Brute Force")
-        c = tk.Canvas(self.root, width=700, height=700, bg="Black")
+        c = tk.Canvas(self.root, width=self.screenwidth, height=self.screenheight, bg="Black")
         title_label = tk.Label(c, text="Simulation for Brute force approach", font=('Comic Sans', 15), bg="black",
                                fg="white")
         c.create_window(350, 20, window=title_label, anchor="center")
@@ -198,12 +204,33 @@ class ConvexHull:
             label_window = c.create_window(temp.x, temp.y - 5, window=coordinates)
         n = len(self.Points)
         c.pack()
+        #Perform brute force
+        print('Gonna print elements of hull from bruteforce')
+        for i in range(n):
+            for j in range(n):
+                if i == j:
+                    continue
+                l1 = Add_Line(self.updated_points[self.Points[i]],self.updated_points[self.Points[j]],c,"Purple")
+                caninclude = True
+                for k in range(n):
+                    if k == j or k == i:
+                        continue
+                    l2 = Add_Line(self.updated_points[self.Points[j]],self.updated_points[self.Points[k]],c,"Green")
+                    result = CheckLine(self.Points[i],self.Points[j],self.Points[k])
+                    self.result_var.set(False)
+                    self.root.after(self.simulation_speed,self.proceed)
+                    self.root.wait_variable(self.result_var)
+                    c.delete(l2)
+                    if result < 0:
+                        caninclude = False
+                        break
+                c.delete(l1)
+                if caninclude:
+                    Add_Line(self.updated_points[self.Points[i]],self.updated_points[self.Points[j]], c, "White")
+                c.pack()
+        c.pack()
         self.root.mainloop()
 
-
-
-
 points = []
-Generate_Points()
-Main = MainMenu()
 
+Main = MainMenu()
