@@ -58,6 +58,9 @@ class MainMenu:         #for the functionalities of main screen...
     def DisplayBruteForce(self):
         self.root.destroy()
         self.obj.BruteForce()
+    def DisplayQuickElimination(self):
+        self.root.destroy()
+        self.obj.QuickElimination()
     def CloseWindow(self):
         self.root.destroy()
         self.obj.root.destroy()
@@ -78,11 +81,13 @@ class MainMenu:         #for the functionalities of main screen...
 
         bruteforce_btn = tk.Button(self.root, text="Simulate Brute Force approach", font=('Comic Sans', 18),command=self.DisplayBruteForce)
 
+        quickelm_btn = tk.Button(self.root,text="Simulate Quick Elimination", font=('Comic Sans', 18),command=self.DisplayQuickElimination)
         title_lbl.pack()
         lbl1.pack(padx=20,pady=70,anchor="w")
+        bruteforce_btn.pack(padx=20, pady=10, anchor="w")
         jarvis_btn.pack(padx=20,pady=10,anchor="w")
         graham_btn.pack(padx=20,pady=10,anchor="w")
-        bruteforce_btn.pack(padx=20,pady=10,anchor="w")
+        quickelm_btn.pack(padx=20, pady=10, anchor="w")
         self.root.mainloop()
 
 class ConvexHull:
@@ -182,6 +187,16 @@ class ConvexHull:
         title_label = tk.Label(c, text="Simulation for Graham Scan Algorithm", font=('Comic Sans', 15), bg="black",fg="white")
         c.create_window(350, 20, window=title_label, anchor="center")
         self.root.protocol("WM_DELETE_WINDOW",self.CloseWindow)
+        origin = self.Points[left_most()]
+        for point in self.Points:
+            temp = Point(point.x, point.y)
+            temp.x = abs(origin.x - temp.x) * 30 + self.start.x
+            temp.y = self.start.y - abs(origin.x + temp.y) * 30
+            self.updated_points[point] = temp
+            c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="red")
+            coordinates = tk.Label(c, text=f"{point.x},{point.y}", font=('Comic Sans', 5), bg="black", fg="white")
+            label_window = c.create_window(temp.x, temp.y - 5, window=coordinates)
+        n = len(self.Points)
         c.pack()
         self.root.mainloop()
     def BruteForce(self):
@@ -205,7 +220,6 @@ class ConvexHull:
         n = len(self.Points)
         c.pack()
         #Perform brute force
-        print('Gonna print elements of hull from bruteforce')
         for i in range(n):
             for j in range(n):
                 if i == j:
@@ -228,6 +242,27 @@ class ConvexHull:
                 if caninclude:
                     Add_Line(self.updated_points[self.Points[i]],self.updated_points[self.Points[j]], c, "White")
                 c.pack()
+        self.root.mainloop()
+
+    def QuickElimination(self):
+        self.root.deiconify()
+        self.root.geometry(f"{self.screenwidth}x{self.screenheight}")
+        self.root.title("Quick Elimination")
+        c = tk.Canvas(self.root, width=self.screenwidth, height=self.screenheight, bg="Black")
+        title_label = tk.Label(c, text="Simulation for Quick Elimination", font=('Comic Sans', 15), bg="black",
+                               fg="white")
+        c.create_window(350, 20, window=title_label, anchor="center")
+        self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
+        origin = self.Points[left_most()]
+        for point in self.Points:
+            temp = Point(point.x, point.y)
+            temp.x = abs(origin.x - temp.x) * 30 + self.start.x
+            temp.y = self.start.y - abs(origin.x + temp.y) * 30
+            self.updated_points[point] = temp
+            c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="red")
+            coordinates = tk.Label(c, text=f"{point.x},{point.y}", font=('Comic Sans', 5), bg="black", fg="white")
+            label_window = c.create_window(temp.x, temp.y - 5, window=coordinates)
+        n = len(self.Points)
         c.pack()
         self.root.mainloop()
 
