@@ -169,6 +169,8 @@ class ConvexHull:
         title_label = tk.Label(c, text=text, font=('Comic Sans', 15), bg="black",fg="white")
         c.create_window(350, 20, window=title_label, anchor="center")
         self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
+        exit_btn = tk.Button(c,text="Main Menu",command=self.CloseWindow)
+        c.create_window(100,100,window=exit_btn)
         origin = self.Points[left_most()]
         for point in self.Points:
             temp = Point(point.x, point.y)
@@ -216,5 +218,4 @@ class ConvexHull:
         self.root.mainloop()
 
 points = []
-
 Main = MainMenu()
