@@ -3,7 +3,8 @@ import math as mp
 from functools import cmp_to_key
 from tkinter import messagebox
 import random
-n = 10
+import time
+n = 15
 class Point:
     def __init__(self, x, y):
         self.x = x
@@ -40,6 +41,7 @@ def left_most() -> int:                 #function for finding leftmost point
                 minn = i
     return minn                 #
 def Generate_Points():                      #Function to generate random points
+    random.seed(time.time())
     while len(points) < n:
         x = random.randint(0, 20)
         y = random.randint(0, 20)
@@ -49,9 +51,6 @@ def Generate_Points():                      #Function to generate random points
             points.append(point)
 def Add_Line(p1, p2, c, color):
     return c.create_line(p1.x, p1.y, p2.x, p2.y, fill=color)
-
-
-
 
 class MainMenu:         #for the functionalities of main screen...
     def __init__(self):
@@ -135,7 +134,6 @@ class ConvexHull:
         n = len(self.Points)
         l = left_most()
         p = l
-        q = 0
 
         while True:
             self.Hull.append(self.Points[p])
@@ -292,35 +290,31 @@ class ConvexHull:
 
     def Chans(self):
         c = self.InitializeWindow("Chans Algorithm", "Simulation for Chan's Algorithm")
+        marked = {}
         Merged_Hull = []
         for t in range(n):
-            for m in range(1,1<<(1<<t)):
+            found=False
+            Merged_Hull = []
+            for m in range(2, (1 << (1 << t))):
+                if m in marked:
+                    continue
                 Merged_Hull = self.Chans_utility(m,c)
                 if len(Merged_Hull) > 0:
                     print("Solution found for m = ", m)
-                    t = n-1
+                    found = True
                     break
+                marked[m] = found
+            if found:
+                break
         for i in range(1,len(Merged_Hull)):
+            self.result_var.set(False)
+            self.root.after(self.simulation_speed, self.proceed)
+            self.root.wait_variable(self.result_var)
             Add_Line(self.updated_points[Merged_Hull[i]],self.updated_points[Merged_Hull[i-1]],c,"white")
         Add_Line(self.updated_points[Merged_Hull[0]], self.updated_points[Merged_Hull[-1]], c, "white")
         c.pack()
         self.root.mainloop()
     def Chans_utility(self,k,c):
-        print("Utility function called for k: ", k)
-        subsets = []
-        subsets_size = n // k
-        for i in range(0, n, subsets_size):
-            subsets.append(self.Points[i:i + subsets_size])
-        hulls = [self.graham_scan_utility(subset) for subset in subsets]
-        colors = ["red","blue","green","yellow","orange","purple","pink","brown","cyan","magenta","lime","olive","gold","silver","gray","lightblue","lightgreen","lightgray"]
-        temp = 0
-        lines = []
-        for h in hulls:
-            for i in range(1, len(h)):
-                lines.append(Add_Line(self.updated_points[h[i - 1]], self.updated_points[h[i]], c, colors[temp]))
-            lines.append(Add_Line(self.updated_points[h[0]], self.updated_points[h[-1]], c, colors[temp]))
-            temp += 1
-        c.pack()
         def extreme_hullpoint():
             h, p = 0, 0
             for i in range(len(hulls)):
@@ -333,7 +327,6 @@ class ConvexHull:
                     h = i
                     p = min_index
             return (h, p)
-
         def tangent(v,p):
             n = len(v)
             l=0
@@ -344,11 +337,11 @@ class ConvexHull:
                 c_after = orientation(p, v[c], v[(c + 1) % n])
                 c_side = orientation(p, v[l], v[c])
                 if c_before != 1 and c_after != 1:
-                    return c;
+                    return c
                 elif (c_side == 2) and (l_after == 1 or l_before == l_after) or (c_side == 1 and c_before == 1):
                     r = c
                 else:
-                    l = c
+                    l = c+1
                 l_before = -c_after
                 l_after = orientation(p, v[l], v[(l + 1) % n])
             return l
@@ -368,18 +361,45 @@ class ConvexHull:
                     next = (h,s)
             return next
 
+        print("Utility function called for k: ", k)
+        subsets = []
+        subsets_size = n // k
+        for i in range(0, n, subsets_size):
+            subsets.append(self.Points[i:i + subsets_size])
+        hulls = [self.graham_scan_utility(subset) for subset in subsets]
+        colors = ["red", "blue", "green", "yellow", "orange", "purple", "pink", "brown", "cyan", "magenta", "lime",
+                  "olive", "gold", "silver", "gray", "lightblue", "lightgreen", "lightgray"]
+        temp = 0
+        lines = []
+        for h in hulls:
+            for i in range(0, len(h)):
+                self.result_var.set(False)
+                self.root.after(self.simulation_speed, self.proceed)
+                self.root.wait_variable(self.result_var)
+                lines.append(Add_Line(self.updated_points[h[i]], self.updated_points[h[(i+1)%len(h)]], c, colors[temp]))
+            temp = temp+1 % 18
+
         merged_hull_points = []
         merged_hull = []
         merged_hull.append(extreme_hullpoint())
+        sol_found=False
         for i in range(k):
+
             p = next_hullpoint()
+
             if p == merged_hull[0]:
+                sol_found = True
                 for j in range(len(merged_hull)):
                     merged_hull_points.append(hulls[merged_hull[j][0]][merged_hull[j][1]])
-                return merged_hull_points
+            if sol_found:
+                break
             merged_hull.append(p)
-        for i in range(len(lines)):
-            c.delete(lines[i])
+        if not sol_found:
+            for i in range(len(lines)):
+                self.result_var.set(False)
+                self.root.after(self.simulation_speed, self.proceed)
+                self.root.wait_variable(self.result_var)
+                c.delete(lines[i])
         return merged_hull_points
     def BruteForce(self):
         n = len(self.Points)
