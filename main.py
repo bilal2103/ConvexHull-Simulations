@@ -23,6 +23,21 @@ def CheckLine(lineEndptA, lineEndptB, ptSubject):       #For brute force method,
                 lineEndptB.x - lineEndptA.x)
 def distance(p, q):
     return mp.sqrt((p.x - q.x) ** 2 + (p.y - q.y) ** 2)
+def nextToTop(S):
+    return S[-2]
+p0_gs=Point(0,0)
+def compare(p1, p2):
+    o = orientation(p0_gs, p1, p2)
+    if o == 0:
+        if distance(p0_gs, p2)**2 >= distance(p0_gs, p1)**2:
+            return -1
+        else:
+            return 1
+    else:
+        if o == 2:
+            return -1
+        else:
+            return 1
 def distSq(p1, p2):
     return ((p1.x - p2.x) * (p1.x - p2.x) +
             (p1.y - p2.y) * (p1.y - p2.y))
@@ -168,6 +183,35 @@ class ConvexHull:
     def GrahamScan(self):
         c = self.InitializeWindow("Graham Scan","Simulation for Graham scan algorithm")
         n = len(self.Points)
+        ymin = self.Points[0].y
+        min = 0
+        for i in range(1, n):
+            y = self.Points[i].y
+            if ((y < ymin) or (ymin == y and self.Points[i].x < self.Points[min].x)):
+                ymin = self.Points[i].y
+                min = i
+        self.Points[0], self.Points[min] = self.Points[min], self.Points[0]
+        p0_gs = self.Points[0]
+        self.Points = sorted(self.Points, key=cmp_to_key(compare))
+        m = 1
+        for i in range(1, n):
+            while ((i < n - 1) and (orientation(p0_gs, self.Points[i], self.Points[i + 1]) == 0)):
+                i += 1
+
+            self.Points[m] = self.Points[i]
+            m += 1
+        S = []
+        S.append(self.Points[0])
+        S.append(self.Points[1])
+        S.append(self.Points[2])
+        for i in range(3, m):
+            while ((len(S) > 1) and (orientation(nextToTop(S), S[-1], self.Points[i]) != 2)):
+                S.pop()
+            S.append(self.Points[i])
+        while S:
+            p = S[-1]
+            print("(" + str(p.x) + ", " + str(p.y) + ")")
+            S.pop()
         c.pack()
         self.root.mainloop()
     def InitializeWindow(self,title,text):
