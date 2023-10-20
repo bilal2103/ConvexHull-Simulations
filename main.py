@@ -26,18 +26,7 @@ def distance(p, q):
 def nextToTop(S):
     return S[-2]
 p0_gs=Point(0,0)
-def compare(p1, p2):
-    o = orientation(p0_gs, p1, p2)
-    if o == 0:
-        if distance(p0_gs, p2)**2 >= distance(p0_gs, p1)**2:
-            return -1
-        else:
-            return 1
-    else:
-        if o == 2:
-            return -1
-        else:
-            return 1
+
 def distSq(p1, p2):
     return ((p1.x - p2.x) * (p1.x - p2.x) +
             (p1.y - p2.y) * (p1.y - p2.y))
@@ -181,6 +170,18 @@ class ConvexHull:
         c.pack()
         self.root.mainloop()
     def GrahamScan(self):
+        def compare(p1, p2):
+            o = orientation(p0_gs, p1, p2)
+            if o == 0:
+                if distance(p0_gs, p2) ** 2 >= distance(p0_gs, p1) ** 2:
+                    return -1
+                else:
+                    return 1
+            else:
+                if o == 2:
+                    return -1
+                else:
+                    return 1
         c = self.InitializeWindow("Graham Scan","Simulation for Graham scan algorithm")
         n = len(self.Points)
         ymin = self.Points[0].y
