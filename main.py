@@ -14,9 +14,9 @@ def orientation(p, q, r):
 
     if val == 0:
         return 0
-    elif val > 0:   #clockwise
+    elif val > 0:
         return 1
-    else:           #counterclockwise
+    else:
         return 2
 def CheckLine(lineEndptA, lineEndptB, ptSubject):       #For brute force method, checking which side of the line do points lie on
     return (ptSubject.x - lineEndptA.x) * (lineEndptB.y - lineEndptA.y) - (ptSubject.y - lineEndptA.y) * (
