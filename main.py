@@ -4,7 +4,7 @@ from functools import cmp_to_key
 from tkinter import messagebox
 import random
 import time
-n = 15
+n = 20
 class Point:
     def __init__(self, x, y):
         self.x = x
@@ -370,8 +370,8 @@ class ConvexHull:
                 else:
                     l = c+1
                 l_before = -c_after
-                l_after = orientation(p, v[l], v[(l + 1) % n])
-            return l
+                l_after = orientation(p, v[l%n], v[(l + 1) % n])
+            return l%n
         def next_hullpoint():
 
             lpoint = merged_hull[-1]
@@ -461,6 +461,10 @@ class ConvexHull:
         n = len(self.Points)
         c.pack()
         self.root.mainloop()
-
+class LineIntersection:
+    def __init__(self):
+        self.p0,self.p1,self.p2,self.p3 = Point(0,0),Point(0,0),Point(0,0),Point(0,0)
+        self.root = tk.Tk()
+        self.root.withdraw()
 points = []
 Main = MainMenu()
