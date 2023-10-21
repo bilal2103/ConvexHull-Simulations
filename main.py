@@ -58,6 +58,36 @@ class MainMenu:         #for the functionalities of main screen...
         Generate_Points()
         self.obj = ConvexHull(points)
         self.DisplayMenu()
+    def CloseWindow(self):
+        self.root.destroy()
+        self.obj.root.destroy()
+    def OpenCHMenu(self):
+        self.CloseWindow()
+        ch = CHMenu()
+    def OpenLineSeg(self):
+        self.CloseWindow()
+    def DisplayMenu(self):
+        self.root.geometry("900x900")
+        self.root.title("Main Menu")
+        self.root.protocol("WM_DELETE_WINDOW",self.CloseWindow)
+        self.root.configure(bg="Black")
+        title_lbl = tk.Label(self.root,text = "CS2009 - Design and Analysis of Algorithm", font=('Century Schoolbook',25))
+        title_lbl.config(bg="Black", fg="White")
+        title_lbl.place(x=110, y=140)
+        title_lbl2 = tk.Label(self.root, text="Semester Project", font=('Century Schoolbook', 25))
+        title_lbl2.config(bg="Black", fg="White")
+        title_lbl2.place(x=290, y=200)
+        ch_btn = tk.Button(self.root, text="Convex Hull Simulations", font=('Century Gothic', 18),command=self.OpenCHMenu)
+        lineseg_btn = tk.Button(self.root, text="Intersecting Line Segments", font=('Century Gothic', 18),command=self.OpenLineSeg)
+        ch_btn.place(x=275, y=350)
+        lineseg_btn.place(x=260, y=450)
+        self.root.mainloop()
+class CHMenu:         #for the functionalities of main screen...
+    def __init__(self):
+        self.root = tk.Tk()
+        Generate_Points()
+        self.obj = ConvexHull(points)
+        self.DisplayCHMenu()
     def DisplayJarvis(self):
         self.root.destroy()
         self.obj.JarvisMarch()
@@ -76,32 +106,24 @@ class MainMenu:         #for the functionalities of main screen...
     def CloseWindow(self):
         self.root.destroy()
         self.obj.root.destroy()
-    def DisplayMenu(self):
+    def DisplayCHMenu(self):
         self.root.geometry("900x900")
-        self.root.title("Main Menu")
+        self.root.title("Convex Hull")
         self.root.protocol("WM_DELETE_WINDOW",self.CloseWindow)
         self.root.configure(bg="Black")
-        title_lbl = tk.Label(self.root,text = "Simulations for algorithms to obtain Convex Hull", font=('Helvetica',25))
-
-        lbl1 = tk.Label(self.root,text="Click any of the following buttons:", font=('Helvetica',20))
-
+        title_lbl = tk.Label(self.root,text = "Simulations of algorithms to obtain Convex Hull", font=('Century Gothic',25))
         title_lbl.config(bg="Black", fg="White")
-        lbl1.configure(bg="Black",fg="White",anchor='w', justify="left")
-        jarvis_btn = tk.Button(self.root,text="Simulate Jarvis March", font=('Helvetica',18),command=self.DisplayJarvis)
-
-        graham_btn = tk.Button(self.root, text="Simulate Graham Scan", font=('Helvetica', 18),command=self.DisplayGraham)
-
-        bruteforce_btn = tk.Button(self.root, text="Simulate Brute Force approach", font=('Helvetica', 18),command=self.DisplayBruteForce)
-
-        quickelm_btn = tk.Button(self.root,text="Simulate Quick Elimination", font=('Helvetica', 18),command=self.DisplayQuickElimination)
-        chans_btn = tk.Button(self.root,text="Simulate Chan's Algorithm",font=("Helvetica", 18),command=self.DisplayChans)
-        title_lbl.pack()
-        lbl1.pack(padx=20,pady=70,anchor="w")
-        bruteforce_btn.pack(padx=20, pady=10, anchor="w")
-        jarvis_btn.pack(padx=20,pady=10,anchor="w")
-        graham_btn.pack(padx=20,pady=10,anchor="w")
-        quickelm_btn.pack(padx=20, pady=10, anchor="w")
-        chans_btn.pack(padx=20, pady=10, anchor="w")
+        jarvis_btn = tk.Button(self.root,text="Simulate Jarvis March", font=('Century Gothic',18),command=self.DisplayJarvis)
+        graham_btn = tk.Button(self.root, text="Simulate Graham Scan", font=('Century Gothic', 18),command=self.DisplayGraham)
+        bruteforce_btn = tk.Button(self.root, text="Simulate Brute Force approach", font=('Century Gothic', 18),command=self.DisplayBruteForce)
+        quickelm_btn = tk.Button(self.root,text="Simulate Quick Elimination", font=('Century Gothic', 18),command=self.DisplayQuickElimination)
+        chans_btn = tk.Button(self.root,text="Simulate Chan's Algorithm",font=('Century Gothic', 18),command=self.DisplayChans)
+        title_lbl.pack(pady=30)
+        bruteforce_btn.place(x=250, y=150)
+        jarvis_btn.place(x=290, y=250)
+        graham_btn.place(x=285, y=350)
+        quickelm_btn.place(x=265, y=450)
+        chans_btn.place(x=267, y=550)
         self.root.mainloop()
 
 
@@ -110,7 +132,9 @@ class ConvexHull:
     Hull = []
     Points = []
     updated_points = {}         #Hashmap that maps points to appropriate coordinates on the screen
-
+    def DisplayCHMenu(self):
+        self.CloseWindow()
+        ch = CHMenu()
     def __init__(self, p):
         self.Points = p
         self.circle_radius = 10
@@ -245,12 +269,12 @@ class ConvexHull:
         self.root.geometry(f"{self.screenwidth}x{self.screenheight}")
         self.root.title(title)
         c = tk.Canvas(self.root, width=self.screenwidth, height=self.screenheight, bg="Black")
-        title_label = tk.Label(c, text=text, font=('Helvetica', 15), bg="black",fg="white")
+        title_label = tk.Label(c, text=text, font=('Century Gothic', 15), bg="black",fg="white")
         c.create_window(350, 20, window=title_label, anchor="center")
         self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
-        exit_btn = tk.Button(c,text="Back",font=("Garamond", 15),command=self.CloseWindow)
+        exit_btn = tk.Button(c,text="Back",font=("Century Gothic", 12),command=self.CloseWindow)
         c.create_window(100,100,window=exit_btn)
-        exit_btn.place(x=550, y=600)
+        exit_btn.place(x=550, y=615)
         origin = self.Points[left_most()]
         for point in self.Points:
             temp = Point(point.x, point.y)
