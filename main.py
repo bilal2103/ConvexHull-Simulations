@@ -106,6 +106,7 @@ class CHMenu:         #for the functionalities of main screen...
     def CloseWindow(self):
         self.root.destroy()
         self.obj.root.destroy()
+        menu = MainMenu()
     def DisplayCHMenu(self):
         self.root.geometry("900x900")
         self.root.title("Convex Hull")
@@ -125,16 +126,11 @@ class CHMenu:         #for the functionalities of main screen...
         quickelm_btn.place(x=265, y=450)
         chans_btn.place(x=267, y=550)
         self.root.mainloop()
-
-
 # noinspection PyStatementEffect
 class ConvexHull:
     Hull = []
     Points = []
     updated_points = {}         #Hashmap that maps points to appropriate coordinates on the screen
-    def DisplayCHMenu(self):
-        self.CloseWindow()
-        ch = CHMenu()
     def __init__(self, p):
         self.Points = p
         self.circle_radius = 10
@@ -152,6 +148,9 @@ class ConvexHull:
     def CloseWindow(self):
         self.root.destroy()
         MainMenu()
+    def DisplayCHMenu(self):
+        self.root.destroy()
+        CHMenu()
     def proceed(self):
         self.result_var.set(True)
     def JarvisMarch(self):
@@ -272,7 +271,7 @@ class ConvexHull:
         title_label = tk.Label(c, text=text, font=('Century Gothic', 15), bg="black",fg="white")
         c.create_window(350, 20, window=title_label, anchor="center")
         self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
-        exit_btn = tk.Button(c,text="Back",font=("Century Gothic", 12),command=self.CloseWindow)
+        exit_btn = tk.Button(c,text="Back",font=("Century Gothic", 12),command=self.DisplayCHMenu)
         c.create_window(100,100,window=exit_btn)
         exit_btn.place(x=550, y=615)
         origin = self.Points[left_most()]
