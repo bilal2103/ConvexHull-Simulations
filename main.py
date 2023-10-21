@@ -14,11 +14,11 @@ def orientation(p, q, r):
           (q.x - p.x) * (r.y - q.y)
 
     if val == 0:
-        return 0
+        return 0    #collinear
     elif val > 0:
-        return 1
+        return 1    #clockwise
     else:
-        return 2
+        return 2    #counter clockwise
 def CheckLine(lineEndptA, lineEndptB, ptSubject):       #For brute force method, checking which side of the line do points lie on
     return (ptSubject.x - lineEndptA.x) * (lineEndptB.y - lineEndptA.y) - (ptSubject.y - lineEndptA.y) * (
                 lineEndptB.x - lineEndptA.x)
@@ -104,6 +104,8 @@ class MainMenu:         #for the functionalities of main screen...
         chans_btn.pack(padx=20, pady=10, anchor="w")
         self.root.mainloop()
 
+
+# noinspection PyStatementEffect
 class ConvexHull:
     Hull = []
     Points = []
@@ -192,6 +194,8 @@ class ConvexHull:
         self.Points[0], self.Points[min] = self.Points[min], self.Points[0]
         p0_gs = self.Points[0]
         self.Points = sorted(self.Points, key=cmp_to_key(compare))
+        line_id = Add_Line(self.updated_points[self.Points[0]], self.updated_points[self.Points[1]], c, "white")
+        c.pack()
         m = 1
         for i in range(1, n):
             while ((i < n - 1) and (orientation(p0_gs, self.Points[i], self.Points[i + 1]) == 0)):
@@ -200,13 +204,36 @@ class ConvexHull:
             self.Points[m] = self.Points[i]
             m += 1
         S = []
+        L = []
+        L.append(line_id)
         S.append(self.Points[0])
         S.append(self.Points[1])
         S.append(self.Points[2])
+        self.result_var.set(False)
+        self.root.after(self.simulation_speed, self.proceed)
+        self.root.wait_variable(self.result_var)
+        line_id = Add_Line(self.updated_points[self.Points[1]], self.updated_points[self.Points[2]], c,"white")
+        L.append(line_id)
         for i in range(3, m):
             while ((len(S) > 1) and (orientation(nextToTop(S), S[-1], self.Points[i]) != 2)):
                 S.pop()
+                c.delete(L[-1])
+                c.pack()
+                L.pop()
             S.append(self.Points[i])
+            self.result_var.set(False)
+            self.root.after(self.simulation_speed, self.proceed)
+            self.root.wait_variable(self.result_var)
+            line_id2 = Add_Line(self.updated_points[self.Points[i-1]], self.updated_points[self.Points[i]], c,"purple")
+            c.pack()
+            self.result_var.set(False)
+            self.root.after(self.simulation_speed, self.proceed)
+            self.root.wait_variable(self.result_var)
+            line_id = Add_Line(self.updated_points[S[-2]], self.updated_points[S[-1]], c,"white")
+            L.append(line_id)
+            c.delete(line_id2)
+            c.pack()
+        line_id = Add_Line(self.updated_points[S[-1]], self.updated_points[S[0]], c, "white")
         while S:
             p = S[-1]
             print("(" + str(p.x) + ", " + str(p.y) + ")")
