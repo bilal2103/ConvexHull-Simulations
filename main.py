@@ -1,45 +1,9 @@
 import tkinter as tk
-import math as mp
 from functools import cmp_to_key
-from tkinter import messagebox
+import External_functions as F
+n = 20
 import random
 import time
-n = 20
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-def orientation(p, q, r):
-    val = (q.y - p.y) * (r.x - q.x) - \
-          (q.x - p.x) * (r.y - q.y)
-
-    if val == 0:
-        return 0    #collinear
-    elif val > 0:
-        return 1    #clockwise
-    else:
-        return 2    #counter clockwise
-def CheckLine(lineEndptA, lineEndptB, ptSubject):       #For brute force method, checking which side of the line do points lie on
-    return (ptSubject.x - lineEndptA.x) * (lineEndptB.y - lineEndptA.y) - (ptSubject.y - lineEndptA.y) * (
-                lineEndptB.x - lineEndptA.x)
-def distance(p, q):
-    return mp.sqrt((p.x - q.x) ** 2 + (p.y - q.y) ** 2)
-def nextToTop(S):
-    return S[-2]
-p0_gs=Point(0,0)
-
-def distSq(p1, p2):
-    return ((p1.x - p2.x) * (p1.x - p2.x) +
-            (p1.y - p2.y) * (p1.y - p2.y))
-def left_most() -> int:                 #function for finding leftmost point
-    minn = 0
-    for i in range(1, len(points)):
-        if points[i].x < points[minn].x:
-            minn = i
-        elif points[i].x == points[minn].x:
-            if points[i].y > points[minn].y:
-                minn = i
-    return minn                 #
 def Generate_Points():                      #Function to generate random points
     random.seed(time.time())
     while len(points) < n:
@@ -49,8 +13,12 @@ def Generate_Points():                      #Function to generate random points
         is_unique = all((point.x != p.x or point.y != p.y) for p in points)
         if is_unique:
             points.append(point)
-def Add_Line(p1, p2, c, color):
-    return c.create_line(p1.x, p1.y, p2.x, p2.y, fill=color)
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+p0_gs=Point(0,0)
 
 class MainMenu:         #for the functionalities of main screen...
     def __init__(self):
@@ -163,13 +131,13 @@ class ConvexHull:
         c = self.InitializeWindow("Jarvis March", "Simulation for Jarvis March algorithm")
         # perform Jarvis March
         n = len(self.Points)
-        l = left_most()
+        l = F.left_most(self.Points)
         p = l
 
         while True:
             self.Hull.append(self.Points[p])
             q = (p + 1) % n
-            line_id = Add_Line(self.updated_points[self.Points[p]], self.updated_points[self.Points[q]], c, "white")
+            line_id = F.Add_Line(self.updated_points[self.Points[p]], self.updated_points[self.Points[q]], c, "white")
             c.pack()
             for i in range(n):
                 if p == i or q == i or p == i:
@@ -177,18 +145,18 @@ class ConvexHull:
                 self.result_var.set(False)                              #To pause the execution for some time
                 self.root.after(self.simulation_speed, self.proceed)    #to call proceed() function after some time
                 self.root.wait_variable(self.result_var)                #Waiting...
-                line_id2 = Add_Line(self.updated_points[self.Points[q]], self.updated_points[self.Points[i]], c,
+                line_id2 = F.Add_Line(self.updated_points[self.Points[q]], self.updated_points[self.Points[i]], c,
                                     "purple")
                 c.pack()
                 self.result_var.set(False)
                 self.root.after(self.simulation_speed, self.proceed)
                 self.root.wait_variable(self.result_var)
-                o = orientation(self.Points[p], self.Points[i], self.Points[q])
+                o = F.orientation(self.Points[p], self.Points[i], self.Points[q])
                 if o == 2:
                     c.delete(line_id)
                     c.delete(line_id2)
                     q = i
-                    line_id = Add_Line(self.updated_points[self.Points[p]], self.updated_points[self.Points[q]], c,
+                    line_id = F.Add_Line(self.updated_points[self.Points[p]], self.updated_points[self.Points[q]], c,
                                        "white")
                 else:
                     c.delete(line_id2)
@@ -200,9 +168,9 @@ class ConvexHull:
         self.root.mainloop()
     def GrahamScan(self):
         def compare(p1, p2):
-            o = orientation(p0_gs, p1, p2)
+            o = F.orientation(p0_gs, p1, p2)
             if o == 0:
-                if distance(p0_gs, p2) ** 2 >= distance(p0_gs, p1) ** 2:
+                if F.distance(p0_gs, p2) ** 2 >= F.distance(p0_gs, p1) ** 2:
                     return -1
                 else:
                     return 1
@@ -223,11 +191,11 @@ class ConvexHull:
         self.Points[0], self.Points[min] = self.Points[min], self.Points[0]
         p0_gs = self.Points[0]
         self.Points = sorted(self.Points, key=cmp_to_key(compare))
-        line_id = Add_Line(self.updated_points[self.Points[0]], self.updated_points[self.Points[1]], c, "white")
+        line_id = F.Add_Line(self.updated_points[self.Points[0]], self.updated_points[self.Points[1]], c, "white")
         c.pack()
         m = 1
         for i in range(1, n):
-            while ((i < n - 1) and (orientation(p0_gs, self.Points[i], self.Points[i + 1]) == 0)):
+            while ((i < n - 1) and (F.orientation(p0_gs, self.Points[i], self.Points[i + 1]) == 0)):
                 i += 1
 
             self.Points[m] = self.Points[i]
@@ -241,10 +209,10 @@ class ConvexHull:
         self.result_var.set(False)
         self.root.after(self.simulation_speed, self.proceed)
         self.root.wait_variable(self.result_var)
-        line_id = Add_Line(self.updated_points[self.Points[1]], self.updated_points[self.Points[2]], c,"white")
+        line_id = F.Add_Line(self.updated_points[self.Points[1]], self.updated_points[self.Points[2]], c,"white")
         L.append(line_id)
         for i in range(3, m):
-            while ((len(S) > 1) and (orientation(nextToTop(S), S[-1], self.Points[i]) != 2)):
+            while ((len(S) > 1) and (F.orientation(F.nextToTop(S), S[-1], self.Points[i]) != 2)):
                 S.pop()
                 c.delete(L[-1])
                 c.pack()
@@ -253,16 +221,16 @@ class ConvexHull:
             self.result_var.set(False)
             self.root.after(self.simulation_speed, self.proceed)
             self.root.wait_variable(self.result_var)
-            line_id2 = Add_Line(self.updated_points[self.Points[i-1]], self.updated_points[self.Points[i]], c,"purple")
+            line_id2 = F.Add_Line(self.updated_points[self.Points[i-1]], self.updated_points[self.Points[i]], c,"purple")
             c.pack()
             self.result_var.set(False)
             self.root.after(self.simulation_speed, self.proceed)
             self.root.wait_variable(self.result_var)
-            line_id = Add_Line(self.updated_points[S[-2]], self.updated_points[S[-1]], c,"white")
+            line_id = F.Add_Line(self.updated_points[S[-2]], self.updated_points[S[-1]], c,"white")
             L.append(line_id)
             c.delete(line_id2)
             c.pack()
-        line_id = Add_Line(self.updated_points[S[-1]], self.updated_points[S[0]], c, "white")
+        line_id = F.Add_Line(self.updated_points[S[-1]], self.updated_points[S[0]], c, "white")
         while S:
             p = S[-1]
             print("(" + str(p.x) + ", " + str(p.y) + ")")
@@ -280,7 +248,7 @@ class ConvexHull:
         exit_btn = tk.Button(c,text="Back",font=("Century Gothic", 12),command=self.CloseWindow)
         c.create_window(100,100,window=exit_btn)
         exit_btn.place(x=550, y=615)
-        origin = self.Points[left_most()]
+        origin = self.Points[F.left_most(self.Points)]
         for point in self.Points:
             temp = Point(point.x, point.y)
             temp.x = abs(origin.x - temp.x) * 20 + self.start.x
@@ -298,10 +266,10 @@ class ConvexHull:
             return points
 
         def compare(p1, p2):
-            # Find orientation
-            o = orientation(p0, p1, p2)
+            # Find F.orientation
+            o = F.orientation(p0, p1, p2)
             if o == 0:
-                if distSq(p0, p2) >= distSq(p0, p1):
+                if F.distSq(p0, p2) >= F.distSq(p0, p1):
                     return -1
                 else:
                     return 1
@@ -329,7 +297,7 @@ class ConvexHull:
             # Keep removing i while angle of i and i+1 is same
             # with respect to p0
             while ((i < n - 1) and
-                   (orientation(p0, points[i], points[i + 1]) == 0)):
+                   (F.orientation(p0, points[i], points[i + 1]) == 0)):
                 i += 1
 
             points[m] = points[i]
@@ -340,7 +308,7 @@ class ConvexHull:
         S.append(points[2])
         for i in range(3, m):
             while ((len(S) > 1) and
-                   (orientation(S[-2], S[-1], points[i]) != 2)):
+                   (F.orientation(S[-2], S[-1], points[i]) != 2)):
                 S.pop()
             S.append(points[i])
         return S
@@ -367,8 +335,8 @@ class ConvexHull:
             self.result_var.set(False)
             self.root.after(self.simulation_speed, self.proceed)
             self.root.wait_variable(self.result_var)
-            Add_Line(self.updated_points[Merged_Hull[i]],self.updated_points[Merged_Hull[i-1]],c,"white")
-        Add_Line(self.updated_points[Merged_Hull[0]], self.updated_points[Merged_Hull[-1]], c, "white")
+            F.Add_Line(self.updated_points[Merged_Hull[i]],self.updated_points[Merged_Hull[i-1]],c,"white")
+        F.Add_Line(self.updated_points[Merged_Hull[0]], self.updated_points[Merged_Hull[-1]], c, "white")
         c.pack()
         self.root.mainloop()
     def Chans_utility(self,k,c):
@@ -387,12 +355,12 @@ class ConvexHull:
         def tangent(v,p):
             n = len(v)
             l=0
-            r,l_before,l_after = n,orientation(p,v[0],v[n-1]),orientation(p,v[0],v[(l+1)%n])
+            r,l_before,l_after = n,F.orientation(p,v[0],v[n-1]),F.orientation(p,v[0],v[(l+1)%n])
             while l < r:
                 c = ((l + r) >> 1)
-                c_before = orientation(p, v[c], v[(c - 1) % n])
-                c_after = orientation(p, v[c], v[(c + 1) % n])
-                c_side = orientation(p, v[l], v[c])
+                c_before = F.orientation(p, v[c], v[(c - 1) % n])
+                c_after = F.orientation(p, v[c], v[(c + 1) % n])
+                c_side = F.orientation(p, v[l], v[c])
                 if c_before != 1 and c_after != 1:
                     return c
                 elif (c_side == 2) and (l_after == 1 or l_before == l_after) or (c_side == 1 and c_before == 1):
@@ -400,7 +368,7 @@ class ConvexHull:
                 else:
                     l = c+1
                 l_before = -c_after
-                l_after = orientation(p, v[l%n], v[(l + 1) % n])
+                l_after = F.orientation(p, v[l%n], v[(l + 1) % n])
             return l%n
         def next_hullpoint():
 
@@ -413,8 +381,8 @@ class ConvexHull:
                 s = tangent(hulls[h],p)
                 q = hulls[next[0]][next[1]]
                 r = hulls[h][s]
-                t = orientation(p,q,r)
-                if t == 1 or (t == 0 and distance(p,r) > distance(p,q)):
+                t = F.orientation(p,q,r)
+                if t == 1 or (t == 0 and F.distance(p,r) > F.distance(p,q)):
                     next = (h,s)
             return next
 
@@ -433,7 +401,7 @@ class ConvexHull:
                 self.result_var.set(False)
                 self.root.after(self.simulation_speed, self.proceed)
                 self.root.wait_variable(self.result_var)
-                lines.append(Add_Line(self.updated_points[h[i]], self.updated_points[h[(i+1)%len(h)]], c, colors[temp]))
+                lines.append(F.Add_Line(self.updated_points[h[i]], self.updated_points[h[(i+1)%len(h)]], c, colors[temp]))
             temp = temp+1 % 18
 
         merged_hull_points = []
@@ -466,13 +434,13 @@ class ConvexHull:
             for j in range(n):
                 if i == j:
                     continue
-                l1 = Add_Line(self.updated_points[self.Points[i]],self.updated_points[self.Points[j]],c,"Purple")
+                l1 = F.Add_Line(self.updated_points[self.Points[i]],self.updated_points[self.Points[j]],c,"Purple")
                 caninclude = True
                 for k in range(n):
                     if k == j or k == i:
                         continue
-                    l2 = Add_Line(self.updated_points[self.Points[j]],self.updated_points[self.Points[k]],c,"Green")
-                    result = CheckLine(self.Points[i],self.Points[j],self.Points[k])
+                    l2 = F.Add_Line(self.updated_points[self.Points[j]],self.updated_points[self.Points[k]],c,"Green")
+                    result = F.CheckLine(self.Points[i],self.Points[j],self.Points[k])
                     self.result_var.set(False)
                     self.root.after(self.simulation_speed,self.proceed)
                     self.root.wait_variable(self.result_var)
@@ -482,7 +450,7 @@ class ConvexHull:
                         break
                 c.delete(l1)
                 if caninclude:
-                    Add_Line(self.updated_points[self.Points[i]],self.updated_points[self.Points[j]], c, "White")
+                    F.Add_Line(self.updated_points[self.Points[i]],self.updated_points[self.Points[j]], c, "White")
                 c.pack()
         self.root.mainloop()
 
@@ -503,7 +471,7 @@ class LineIntersection:
         self.root.config(bg="black")
         title_lbl = tk.Label(self.root,text="Algorithms to identify whether two\n line segments intersect",font=('Comic Sans ms',20),bg="black",fg="white")
         title_lbl.pack()
-        method1_btn = tk.Button(self.root,text="Check using orientation",command=self.CheckOrientation,font=('Comic Sans ms',15))
+        method1_btn = tk.Button(self.root,text="Check using F.orientation",command=self.CheckOrientation,font=('Comic Sans ms',15))
         method2_btn = tk.Button(self.root,text="Check using ...", command=self.CheckOrientation,font=('Comic Sans ms', 15))
         method3_btn = tk.Button(self.root,text="Check using ...", command=self.CheckOrientation,font=('Comic Sans ms', 15))
         lbl1 = tk.Label(self.root, text="Click any of the following buttons:", font=('Comic Sans ms', 20))
@@ -526,4 +494,4 @@ class LineIntersection:
         self.root.mainloop()
 
 points = []
-LineIntersection()
+MainMenu()
