@@ -77,6 +77,15 @@ class MainMenu:         #for the functionalities of main screen...
         title_lbl2 = tk.Label(self.root, text="Semester Project", font=('Century Schoolbook', 25))
         title_lbl2.config(bg="Black", fg="White")
         title_lbl2.place(x=290, y=200)
+        grp1 = tk.Label(self.root, text="Bilal Hassan 21K-4669",font=('Century Schoolbook', 12))
+        grp2 = tk.Label(self.root, text="Aiman Imran 21K-4525", font=('Century Schoolbook', 12))
+        grp3 = tk.Label(self.root, text="Seher Imtiaz 21K-3363", font=('Century Schoolbook', 12))
+        grp1.config(bg="Black", fg="White")
+        grp2.config(bg="Black", fg="White")
+        grp3.config(bg="Black", fg="White")
+        grp1.place(x=650,y=610)
+        grp2.place(x=650, y=640)
+        grp3.place(x=650, y=670)
         ch_btn = tk.Button(self.root, text="Convex Hull Simulations", font=('Century Gothic', 18),command=self.OpenCHMenu)
         lineseg_btn = tk.Button(self.root, text="Intersecting Line Segments", font=('Century Gothic', 18),command=self.OpenLineSeg)
         ch_btn.place(x=275, y=350)
@@ -146,9 +155,6 @@ class ConvexHull:
         for point in self.Hull:
             print(str(point.x) + ',' + str(point.y))
     def CloseWindow(self):
-        self.root.destroy()
-        MainMenu()
-    def DisplayCHMenu(self):
         self.root.destroy()
         CHMenu()
     def proceed(self):
@@ -271,7 +277,7 @@ class ConvexHull:
         title_label = tk.Label(c, text=text, font=('Century Gothic', 15), bg="black",fg="white")
         c.create_window(350, 20, window=title_label, anchor="center")
         self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
-        exit_btn = tk.Button(c,text="Back",font=("Century Gothic", 12),command=self.DisplayCHMenu)
+        exit_btn = tk.Button(c,text="Back",font=("Century Gothic", 12),command=self.CloseWindow)
         c.create_window(100,100,window=exit_btn)
         exit_btn.place(x=550, y=615)
         origin = self.Points[left_most()]
