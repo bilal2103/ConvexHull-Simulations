@@ -81,20 +81,20 @@ class MainMenu:         #for the functionalities of main screen...
         self.root.title("Main Menu")
         self.root.protocol("WM_DELETE_WINDOW",self.CloseWindow)
         self.root.configure(bg="Black")
-        title_lbl = tk.Label(self.root,text = "Simulations for algorithms to obtain Convex Hull", font=('Comic Sans',25))
+        title_lbl = tk.Label(self.root,text = "Simulations for algorithms to obtain Convex Hull", font=('Helvetica',25))
 
-        lbl1 = tk.Label(self.root,text="Click any of the following buttons:", font=('Comic Sans',20))
+        lbl1 = tk.Label(self.root,text="Click any of the following buttons:", font=('Helvetica',20))
 
         title_lbl.config(bg="Black", fg="White")
         lbl1.configure(bg="Black",fg="White",anchor='w', justify="left")
-        jarvis_btn = tk.Button(self.root,text="Simulate Jarvis March", font=('Comic Sans',18),command=self.DisplayJarvis)
+        jarvis_btn = tk.Button(self.root,text="Simulate Jarvis March", font=('Helvetica',18),command=self.DisplayJarvis)
 
-        graham_btn = tk.Button(self.root, text="Simulate Graham Scan", font=('Comic Sans', 18),command=self.DisplayGraham)
+        graham_btn = tk.Button(self.root, text="Simulate Graham Scan", font=('Helvetica', 18),command=self.DisplayGraham)
 
-        bruteforce_btn = tk.Button(self.root, text="Simulate Brute Force approach", font=('Comic Sans', 18),command=self.DisplayBruteForce)
+        bruteforce_btn = tk.Button(self.root, text="Simulate Brute Force approach", font=('Helvetica', 18),command=self.DisplayBruteForce)
 
-        quickelm_btn = tk.Button(self.root,text="Simulate Quick Elimination", font=('Comic Sans', 18),command=self.DisplayQuickElimination)
-        chans_btn = tk.Button(self.root,text="Simulate Chan's Algorithm",font=('Comic Sans', 18),command=self.DisplayChans)
+        quickelm_btn = tk.Button(self.root,text="Simulate Quick Elimination", font=('Helvetica', 18),command=self.DisplayQuickElimination)
+        chans_btn = tk.Button(self.root,text="Simulate Chan's Algorithm",font=("Helvetica", 18),command=self.DisplayChans)
         title_lbl.pack()
         lbl1.pack(padx=20,pady=70,anchor="w")
         bruteforce_btn.pack(padx=20, pady=10, anchor="w")
@@ -245,11 +245,12 @@ class ConvexHull:
         self.root.geometry(f"{self.screenwidth}x{self.screenheight}")
         self.root.title(title)
         c = tk.Canvas(self.root, width=self.screenwidth, height=self.screenheight, bg="Black")
-        title_label = tk.Label(c, text=text, font=('Comic Sans', 15), bg="black",fg="white")
+        title_label = tk.Label(c, text=text, font=('Helvetica', 15), bg="black",fg="white")
         c.create_window(350, 20, window=title_label, anchor="center")
         self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
-        exit_btn = tk.Button(c,text="Main Menu",command=self.CloseWindow)
+        exit_btn = tk.Button(c,text="Back",font=("Garamond", 15),command=self.CloseWindow)
         c.create_window(100,100,window=exit_btn)
+        exit_btn.place(x=550, y=600)
         origin = self.Points[left_most()]
         for point in self.Points:
             temp = Point(point.x, point.y)
@@ -257,7 +258,7 @@ class ConvexHull:
             temp.y = self.start.y - abs(origin.x + temp.y) * 20
             self.updated_points[point] = temp
             c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="red")
-            coordinates = tk.Label(c, text=f"{point.x},{point.y}", font=('Comic Sans', 5), bg="black", fg="white")
+            coordinates = tk.Label(c, text=f"{point.x},{point.y}", font=('Helvetica', 5), bg="black", fg="white")
             label_window = c.create_window(temp.x, temp.y - 5, window=coordinates)
         c.pack()
         return c
