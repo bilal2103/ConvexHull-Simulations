@@ -1,9 +1,9 @@
 import tkinter as tk
 from functools import cmp_to_key
 import External_functions as F
-n = 20
 import random
 import time
+n = 20
 def Generate_Points():                      #Function to generate random points
     random.seed(time.time())
     while len(points) < n:
@@ -23,17 +23,15 @@ p0_gs=Point(0,0)
 class MainMenu:         #for the functionalities of main screen...
     def __init__(self):
         self.root = tk.Tk()
-        Generate_Points()
-        self.obj = ConvexHull(points)
         self.DisplayMenu()
     def CloseWindow(self):
         self.root.destroy()
-        self.obj.root.destroy()
     def OpenCHMenu(self):
         self.CloseWindow()
-        ch = CHMenu()
+        CHMenu()
     def OpenLineSeg(self):
         self.CloseWindow()
+        LIMenu()
     def DisplayMenu(self):
         self.root.geometry("900x900")
         self.root.title("Main Menu")
@@ -83,7 +81,7 @@ class CHMenu:         #for the functionalities of main screen...
     def CloseWindow(self):
         self.root.destroy()
         self.obj.root.destroy()
-        menu = MainMenu()
+        MainMenu()
     def DisplayCHMenu(self):
         self.root.geometry("900x900")
         self.root.title("Convex Hull")
@@ -118,10 +116,6 @@ class ConvexHull:
         self.result_var = tk.BooleanVar(self.root)
         self.simulation_speed = 100             #Change this so that program runs faster/slower.
         self.root.withdraw()
-    def display_Hull(self):
-        print('Displaying points that are part of the hull')
-        for point in self.Hull:
-            print(str(point.x) + ',' + str(point.y))
     def CloseWindow(self):
         self.root.destroy()
         CHMenu()
@@ -259,7 +253,6 @@ class ConvexHull:
             label_window = c.create_window(temp.x, temp.y - 5, window=coordinates)
         c.pack()
         return c
-
     def graham_scan_utility(self,points):
 
         if len(points) <= 2 :
@@ -312,7 +305,6 @@ class ConvexHull:
                 S.pop()
             S.append(points[i])
         return S
-
     def Chans(self):
         c = self.InitializeWindow("Chans Algorithm", "Simulation for Chan's Algorithm")
         marked = {}
@@ -392,7 +384,7 @@ class ConvexHull:
         for i in range(0, n, subsets_size):
             subsets.append(self.Points[i:i + subsets_size])
         hulls = [self.graham_scan_utility(subset) for subset in subsets]
-        colors = ["red", "blue", "green", "yellow", "orange", "purple", "pink", "brown", "cyan", "magenta", "lime",
+        colors = ["blue", "green", "yellow", "orange", "purple", "pink", "brown", "cyan", "magenta", "lime",
                   "olive", "gold", "silver", "gray", "lightblue", "lightgreen", "lightgray"]
         temp = 0
         lines = []
@@ -402,7 +394,7 @@ class ConvexHull:
                 self.root.after(self.simulation_speed, self.proceed)
                 self.root.wait_variable(self.result_var)
                 lines.append(F.Add_Line(self.updated_points[h[i]], self.updated_points[h[(i+1)%len(h)]], c, colors[temp]))
-            temp = temp+1 % 18
+            temp = temp+1 % 17
 
         merged_hull_points = []
         merged_hull = []
@@ -453,43 +445,56 @@ class ConvexHull:
                     F.Add_Line(self.updated_points[self.Points[i]],self.updated_points[self.Points[j]], c, "White")
                 c.pack()
         self.root.mainloop()
-
     def QuickElimination(self):
         c = self.InitializeWindow("Quick elimination", "Simulation for Quick Elimination algorithm")
         n = len(self.Points)
         c.pack()
         self.root.mainloop()
-class LineIntersection:
+class LIMenu:
     def __init__(self):
         self.p0,self.p1,self.p2,self.p3 = Point(0,0),Point(0,0),Point(0,0),Point(0,0)
         self.root = tk.Tk()
-        self.root.withdraw()
         self.DisplayOptions()
+
+    def CloseWindow(self):
+        self.root.destroy()
+        MainMenu()
+
+    def CheckOrientation(self):
+        self.root.destroy()
+        LineIntersection()
     def DisplayOptions(self):
-        self.root.deiconify()
         self.root.geometry("900x900")
         self.root.config(bg="black")
+        self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
         title_lbl = tk.Label(self.root,text="Algorithms to identify whether two\n line segments intersect",font=('Comic Sans ms',20),bg="black",fg="white")
         title_lbl.pack()
-        method1_btn = tk.Button(self.root,text="Check using F.orientation",command=self.CheckOrientation,font=('Comic Sans ms',15))
+        method1_btn = tk.Button(self.root,text="Check using orientation",command=self.CheckOrientation,font=('Comic Sans ms',15))
         method2_btn = tk.Button(self.root,text="Check using ...", command=self.CheckOrientation,font=('Comic Sans ms', 15))
         method3_btn = tk.Button(self.root,text="Check using ...", command=self.CheckOrientation,font=('Comic Sans ms', 15))
         lbl1 = tk.Label(self.root, text="Click any of the following buttons:", font=('Comic Sans ms', 20))
+        lbl1.config(bg="black",fg="white")
         lbl1.pack(padx=20,pady=70,anchor="w")
         method1_btn.pack(padx=20,pady=10,anchor="w")
         method2_btn.pack(padx=20, pady=10, anchor="w")
         method3_btn.pack(padx=20, pady=10, anchor="w")
         self.root.mainloop()
-    def CheckOrientation(self):
-        self.root.destroy()
+
+class LineIntersection:
+    def __init__(self):
         self.root = tk.Tk()
+        self.CheckOrientation()
+    def CloseWindow(self):
+        self.root.destroy()
+        LIMenu()
+    def CheckOrientation(self):
+        self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
         self.root.geometry("700x700")
         self.root.config(bg="black")
         title_lbl = tk.Label(text="Orientation test",font=('Comic Sans ms',20))
         title_lbl.pack(pady=20,anchor="center")
         title_lbl.config(bg="black",fg="white")
         c = tk.Canvas(width=500,height=500,highlightthickness=0,bg="black")
-
         c.pack()
         self.root.mainloop()
 
