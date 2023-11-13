@@ -31,7 +31,7 @@ class MainMenu:         #for the functionalities of main screen...
         CHMenu()
     def OpenLineSeg(self):
         self.CloseWindow()
-        LIMenu()
+        LIMenu(LinePoints)
     def DisplayMenu(self):
         self.root.geometry("900x900")
         self.root.title("Main Menu")
@@ -116,6 +116,7 @@ class ConvexHull:
         self.result_var = tk.BooleanVar(self.root)
         self.simulation_speed = 100             #Change this so that program runs faster/slower.
         self.root.withdraw()
+
     def CloseWindow(self):
         self.root.destroy()
         CHMenu()
@@ -451,52 +452,124 @@ class ConvexHull:
         c.pack()
         self.root.mainloop()
 class LIMenu:
-    def __init__(self):
-        self.p0,self.p1,self.p2,self.p3 = Point(0,0),Point(0,0),Point(0,0),Point(0,0)
+    def __init__(self,lines):
+        self.Points = lines
         self.root = tk.Tk()
+        self.obj = LineIntersection(self.Points)
         self.DisplayOptions()
 
     def CloseWindow(self):
         self.root.destroy()
+        self.obj.root.destroy()
         MainMenu()
 
     def CheckOrientation(self):
         self.root.destroy()
-        LineIntersection()
+        self.obj.CheckOrientation()
+    def AntoniosMethod(self):
+        self.root.destroy()
+        self.obj.AntoniosMethod()
     def DisplayOptions(self):
         self.root.geometry("900x900")
         self.root.config(bg="black")
+        self.root.title("Line intersection")
         self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
         title_lbl = tk.Label(self.root,text="Algorithms to identify whether two\n line segments intersect",font=('Comic Sans ms',20),bg="black",fg="white")
         title_lbl.pack()
         method1_btn = tk.Button(self.root,text="Check using orientation",command=self.CheckOrientation,font=('Comic Sans ms',15))
-        method2_btn = tk.Button(self.root,text="Check using ...", command=self.CheckOrientation,font=('Comic Sans ms', 15))
-        method3_btn = tk.Button(self.root,text="Check using ...", command=self.CheckOrientation,font=('Comic Sans ms', 15))
+        method2_btn = tk.Button(self.root,text="Check using Franklin Antonio's Method", command=self.AntoniosMethod,font=('Comic Sans ms', 15))
         lbl1 = tk.Label(self.root, text="Click any of the following buttons:", font=('Comic Sans ms', 20))
         lbl1.config(bg="black",fg="white")
         lbl1.pack(padx=20,pady=70,anchor="w")
         method1_btn.pack(padx=20,pady=10,anchor="w")
         method2_btn.pack(padx=20, pady=10, anchor="w")
-        method3_btn.pack(padx=20, pady=10, anchor="w")
         self.root.mainloop()
 
 class LineIntersection:
-    def __init__(self):
+    def __init__(self,points):
+        self.Points = points
+        self.updated_points = {}
+        self.circle_radius = 10
+        self.start = Point(200, 650)
+        self.screenheight = 700
+        self.screenwidth = 700
         self.root = tk.Tk()
-        self.CheckOrientation()
+        self.root.withdraw()
     def CloseWindow(self):
         self.root.destroy()
-        LIMenu()
-    def CheckOrientation(self):
+        LIMenu(self.Points)
+
+    def InitializeWindow(self,title,text):
+        self.root.deiconify()
         self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
         self.root.geometry("700x700")
         self.root.config(bg="black")
-        title_lbl = tk.Label(text="Orientation test",font=('Comic Sans ms',20))
-        title_lbl.pack(pady=20,anchor="center")
-        title_lbl.config(bg="black",fg="white")
-        c = tk.Canvas(width=500,height=500,highlightthickness=0,bg="black")
+        self.root.title(title)
+        title_lbl = tk.Label(self.root,text=text, font=('Comic Sans ms', 20))
+        title_lbl.pack(pady=20, anchor="center")
+        title_lbl.config(bg="black", fg="white")
+        c = tk.Canvas(self.root,width=700, height=700, highlightthickness=0, bg="black")
+        origin = self.Points[F.left_most(self.Points)]
+        for point in self.Points:
+            temp = Point(point.x, point.y)
+            temp.x = abs(origin.x - temp.x) * 20 + self.start.x
+            temp.y = self.start.y - abs(origin.x + temp.y) * 20
+            self.updated_points[point] = temp
+            c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="red")
+            coordinates = tk.Label(c, text=f"{point.x},{point.y}", font=('Helvetica', 5), bg="black", fg="white")
+            label_window = c.create_window(temp.x, temp.y - 5, window=coordinates)
+        F.Add_Line(self.updated_points[self.Points[0]],self.updated_points[self.Points[1]],c,"Green")
+        F.Add_Line(self.updated_points[self.Points[2]], self.updated_points[self.Points[3]], c, "Blue")
+        c.pack(anchor='w')
+        return c,origin
+    def CheckOrientation(self):
+        c,origin = self.InitializeWindow("Orientation Window","Orientation test")
+        displayRes = tk.Text(c,height=10,width=200,bd=0)
+        displayRes.place(x=10,y=100,anchor='w')
+        fltp = F.StringOrientation(self.Points[0],self.Points[1],self.Points[2])
+        flfp = F.StringOrientation(self.Points[0],self.Points[1],self.Points[3])
+        slfp = F.StringOrientation(self.Points[2],self.Points[3],self.Points[0])
+        slsp = F.StringOrientation(self.Points[2],self.Points[3],self.Points[1])
+        flag = F.doIntersect(self.Points[0],self.Points[1],self.Points[2],self.Points[3])
+        orientationText = (f"First Point:  ({self.Points[0].x},{self.Points[0].y})\n"
+                           f"Second Point: ({self.Points[1].x},{self.Points[1].y})\n"
+                           f"Third Point:  ({self.Points[2].x},{self.Points[2].y})\n"
+                           f"Fourth Point: ({self.Points[3].x},{self.Points[3].y})\n"
+                           f"Orientation of first line segment w.r.t third point: {fltp}\n"
+                           f"Orientation of first line segment w.r.t fourth point: {flfp}\n"
+                           f"Orientation of second line segment w.r.t first point: {slfp}\n"
+                           f"Orientation of second line segment w.r.t second point: {slsp}\n"
+                           )
+        if flag:
+            orientationText += 'The given line segments intersect'
+        else:
+            orientationText += 'The given line segments do not intersect'
+        displayRes.insert("1.0",orientationText)
+        displayRes.config(bg="black",fg="white")
+        c.pack()
+        self.root.mainloop()
+    def AntoniosMethod(self):
+        c,origin = self.InitializeWindow("Antonio's Intersection", "Franklin Antonio's Faster Line Segment Intersection")
+        x,y = F.AntoniosMethod(self.Points)
+        IntersectingPoint = Point(x,y)
+        displayRes = tk.Text(c, height=10, width=200, bd=0)
+        displayRes.place(x=10, y=100, anchor='w')
+        orientationText = ""
+        if IntersectingPoint.x == -1 and IntersectingPoint.y == -1:
+            orientationText += 'The given line segments do not intersect'
+        else:
+            orientationText += f"The given line segments intersect at ({IntersectingPoint.x},{IntersectingPoint.y})"
+            temp = Point(IntersectingPoint.x, IntersectingPoint.y)
+            temp.x = abs(origin.x - temp.x) * 20 + self.start.x-5
+            temp.y = self.start.y - abs(origin.x + temp.y) * 20 -5
+            c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="purple")
+            coordinates = tk.Label(c, text=f"{format(IntersectingPoint.x,'.2f')},{format(IntersectingPoint.y,'.2f')}", font=('Helvetica', 5), bg="black", fg="white")
+            label_window = c.create_window(temp.x+30, temp.y+20, window=coordinates)
+        displayRes.insert("1.0", orientationText)
+        displayRes.config(bg="black", fg="white")
         c.pack()
         self.root.mainloop()
 
 points = []
+LinePoints = [Point(3, 8),Point(19, 12),Point(13, 20),Point(8, 2)]
 MainMenu()
