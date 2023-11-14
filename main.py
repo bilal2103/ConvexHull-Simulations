@@ -5,14 +5,16 @@ import random
 import time
 n = 20
 def Generate_Points():                      #Function to generate random points
-    random.seed(time.time())
-    while len(points) < n:
-        x = random.randint(0, 20)
-        y = random.randint(0, 20)
-        point = Point(x, y)
-        is_unique = all((point.x != p.x or point.y != p.y) for p in points)
-        if is_unique:
+    with open('coordinates.txt', 'r') as file:
+        for line in file:
+            x, y = map(int, line.strip().split(','))
+            point = Point(x, y)
             points.append(point)
+    with open('line.txt', 'r') as file:
+        for line in file:
+            x, y = map(int, line.strip().split(','))
+            lp = Point(x, y)
+            LinePoints.append(lp)
 class Point:
     def __init__(self, x, y):
         self.x = x
@@ -23,6 +25,7 @@ p0_gs=Point(0,0)
 class MainMenu:         #for the functionalities of main screen...
     def __init__(self):
         self.root = tk.Tk()
+        Generate_Points()
         self.DisplayMenu()
     def CloseWindow(self):
         self.root.destroy()
@@ -60,7 +63,6 @@ class MainMenu:         #for the functionalities of main screen...
 class CHMenu:         #for the functionalities of main screen...
     def __init__(self):
         self.root = tk.Tk()
-        Generate_Points()
         self.obj = ConvexHull(points)
         self.DisplayCHMenu()
     def DisplayJarvis(self):
@@ -186,6 +188,19 @@ class ConvexHull:
         self.Points[0], self.Points[min] = self.Points[min], self.Points[0]
         p0_gs = self.Points[0]
         self.Points = sorted(self.Points, key=cmp_to_key(compare))
+        L = []
+        for i in range(1,n):
+            lid = F.Add_Line(self.updated_points[self.Points[0]], self.updated_points[self.Points[i]], c, "purple")
+            L.append(lid)
+            self.result_var.set(False)
+            self.root.after(self.simulation_speed, self.proceed)
+            self.root.wait_variable(self.result_var)
+            c.pack()
+        while(len(L)>0):
+            c.delete(L[-1])
+            c.pack()
+            L.pop()
+
         line_id = F.Add_Line(self.updated_points[self.Points[0]], self.updated_points[self.Points[1]], c, "white")
         c.pack()
         m = 1
@@ -196,7 +211,6 @@ class ConvexHull:
             self.Points[m] = self.Points[i]
             m += 1
         S = []
-        L = []
         L.append(line_id)
         S.append(self.Points[0])
         S.append(self.Points[1])
@@ -474,15 +488,17 @@ class LIMenu:
         self.root.config(bg="black")
         self.root.title("Line intersection")
         self.root.protocol("WM_DELETE_WINDOW", self.CloseWindow)
-        title_lbl = tk.Label(self.root,text="Algorithms to identify whether two\n line segments intersect",font=('Comic Sans ms',20),bg="black",fg="white")
+        title_lbl = tk.Label(self.root,text="Algorithms to identify whether two\n line segments intersect", font=('Century Gothic',25))
         title_lbl.pack()
-        method1_btn = tk.Button(self.root,text="Check using orientation",command=self.CheckOrientation,font=('Comic Sans ms',15))
-        method2_btn = tk.Button(self.root,text="Check using Franklin Antonio's Method", command=self.AntoniosMethod,font=('Comic Sans ms', 15))
-        lbl1 = tk.Label(self.root, text="Click any of the following buttons:", font=('Comic Sans ms', 20))
+        method1_btn = tk.Button(self.root,text="Check using orientation",command=self.CheckOrientation,font=('Century Gothic',18))
+        method2_btn = tk.Button(self.root,text="Check using Franklin Antonio's Method", command=self.AntoniosMethod,font=('Century Gothic',18))
+        lbl1 = tk.Label(self.root, text="Click any of the following buttons:", font=('Century Gothic', 20))
+        title_lbl.config(bg="black", fg="white")
         lbl1.config(bg="black",fg="white")
-        lbl1.pack(padx=20,pady=70,anchor="w")
-        method1_btn.pack(padx=20,pady=10,anchor="w")
-        method2_btn.pack(padx=20, pady=10, anchor="w")
+        title_lbl.pack(pady=30)
+        lbl1.place(x=250, y=150)
+        method1_btn.place(x=300, y=250)
+        method2_btn.place(x=215, y=350)
         self.root.mainloop()
 
 class LineIntersection:
@@ -571,5 +587,5 @@ class LineIntersection:
         self.root.mainloop()
 
 points = []
-LinePoints = [Point(3, 8),Point(19, 12),Point(13, 20),Point(8, 2)]
+LinePoints = []
 MainMenu()
