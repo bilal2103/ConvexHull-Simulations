@@ -522,7 +522,7 @@ class LineIntersection:
         self.root.geometry("700x700")
         self.root.config(bg="black")
         self.root.title(title)
-        title_lbl = tk.Label(self.root,text=text, font=('Comic Sans ms', 20))
+        title_lbl = tk.Label(self.root,text=text, font=('Century Gothic', 20))
         title_lbl.pack(pady=20, anchor="center")
         title_lbl.config(bg="black", fg="white")
         c = tk.Canvas(self.root,width=700, height=700, highlightthickness=0, bg="black")
@@ -535,8 +535,8 @@ class LineIntersection:
             c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="red")
             coordinates = tk.Label(c, text=f"{point.x},{point.y}", font=('Helvetica', 5), bg="black", fg="white")
             label_window = c.create_window(temp.x, temp.y - 5, window=coordinates)
-        F.Add_Line(self.updated_points[self.Points[0]],self.updated_points[self.Points[1]],c,"Green")
-        F.Add_Line(self.updated_points[self.Points[2]], self.updated_points[self.Points[3]], c, "Blue")
+        F.Add_Line(self.updated_points[self.Points[0]],self.updated_points[self.Points[1]],c,"SeaGreen1")
+        F.Add_Line(self.updated_points[self.Points[2]], self.updated_points[self.Points[3]], c, "powder blue")
         c.pack(anchor='w')
         return c,origin
     def CheckOrientation(self):
@@ -579,7 +579,7 @@ class LineIntersection:
             temp = Point(IntersectingPoint.x, IntersectingPoint.y)
             temp.x = abs(origin.x - temp.x) * 20 + self.start.x-5
             temp.y = self.start.y - abs(origin.x + temp.y) * 20 -5
-            c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="purple")
+            c.create_oval(temp.x, temp.y, temp.x + self.circle_radius, temp.y + self.circle_radius, fill="magenta2")
             coordinates = tk.Label(c, text=f"{format(IntersectingPoint.x,'.2f')},{format(IntersectingPoint.y,'.2f')}", font=('Helvetica', 5), bg="black", fg="white")
             label_window = c.create_window(temp.x+30, temp.y+20, window=coordinates)
         displayRes.insert("1.0", orientationText)
