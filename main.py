@@ -196,6 +196,7 @@ class ConvexHull:
             self.root.after(self.simulation_speed, self.proceed)
             self.root.wait_variable(self.result_var)
             c.pack()
+        time.sleep(1)
         while(len(L)>0):
             c.delete(L[-1])
             c.pack()
