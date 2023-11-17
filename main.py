@@ -5,10 +5,18 @@ import random
 import time
 n = 20
 def Generate_Points():                      #Function to generate random points
-    with open('coordinates.txt', 'r') as file:
+    """with open('coordinates.txt', 'r') as file:
         for line in file:
             x, y = map(int, line.strip().split(','))
             point = Point(x, y)
+            points.append(point)"""
+    random.seed(time.time())
+    while len(points) < n:
+        x = random.randint(0, 20)
+        y = random.randint(0, 20)
+        point = Point(x, y)
+        is_unique = all((point.x != p.x or point.y != p.y) for p in points)
+        if is_unique:
             points.append(point)
     with open('line.txt', 'r') as file:
         for line in file:
@@ -464,7 +472,59 @@ class ConvexHull:
     def QuickElimination(self):
         c = self.InitializeWindow("Quick elimination", "Simulation for Quick Elimination algorithm")
         n = len(self.Points)
-        c.pack()
+        hull = []
+        def findingnext(val1, val2, val3):
+            value = (val3.y- val1.y) * (val2.x - val1.x) - (val2.y- val1.y) * (val3.x - val1.x)
+            if value > 0:
+                return 1  # anti-clockwise
+            if value < 0:
+                return -1  # clockwise
+            if value == 0:
+                return 0  # linear
+
+        def line_distance(val1, val2, val3):
+            return abs((val3.y - val1.y) * (val2.x - val1.x) - (val2.y - val1.y) * (val3.x - val1.x))
+
+        def hullfunc(p1, p2, wise):
+            index_value = -1
+            max_dist = 0
+            for i in range(n):
+                temp = line_distance(p1, p2, self.Points[i])
+                line_id2 = F.Add_Line(self.updated_points[self.Points[i - 1]], self.updated_points[self.Points[i]], c,"purple")
+                c.pack()
+                self.result_var.set(False)
+                self.root.after(self.simulation_speed, self.proceed)
+                self.root.wait_variable(self.result_var)
+                if (findingnext(p1, p2, self.Points[i]) == wise) and (temp > max_dist):
+                    index_value = i
+                    max_dist = temp
+                c.delete(line_id2)
+
+            if index_value == -1:
+                hull.append(p1)
+                hull.append(p2)
+                line_id = F.Add_Line(self.updated_points[p1], self.updated_points[p2], c, "white")
+                self.result_var.set(False)
+                self.root.after(self.simulation_speed, self.proceed)
+                self.root.wait_variable(self.result_var)
+                c.pack()
+                return
+
+            hullfunc(self.Points[index_value], p1, -findingnext(self.Points[index_value], p1, p2))
+            hullfunc(self.Points[index_value], p2, -findingnext(self.Points[index_value], p2, p1))
+
+        def printfunc():
+            min_x = 0
+            max_x = 0
+            for i in range(1, n):
+                if self.Points[i].x < self.Points[min_x].x:
+                    min_x = i
+                if self.Points[i].x > self.Points[max_x].x:
+                    max_x = i
+            hullfunc(self.Points[min_x], self.Points[max_x], 1)
+            hullfunc(self.Points[min_x], self.Points[max_x], -1)
+
+        printfunc()
         self.root.mainloop()
 class LIMenu:
     def __init__(self,lines):
