@@ -5,19 +5,19 @@ import random
 import time
 n = 20
 def Generate_Points():                      #Function to generate random points
-    """with open('coordinates.txt', 'r') as file:
+    with open('coordinates.txt', 'r') as file:
         for line in file:
             x, y = map(int, line.strip().split(','))
             point = Point(x, y)
-            points.append(point)"""
-    random.seed(time.time())
+            points.append(point)
+    """random.seed(time.time())
     while len(points) < n:
         x = random.randint(0, 20)
         y = random.randint(0, 20)
         point = Point(x, y)
         is_unique = all((point.x != p.x or point.y != p.y) for p in points)
         if is_unique:
-            points.append(point)
+            points.append(point)"""
     with open('line.txt', 'r') as file:
         for line in file:
             x, y = map(int, line.strip().split(','))
