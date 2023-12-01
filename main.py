@@ -145,7 +145,7 @@ class ConvexHull:
             line_id = F.Add_Line(self.updated_points[self.Points[p]], self.updated_points[self.Points[q]], c, "white")
             c.pack()
             for i in range(n):
-                if p == i or q == i or p == i:
+                if p == i or q == i:
                     continue
                 self.result_var.set(False)                              #To pause the execution for some time
                 self.root.after(self.simulation_speed, self.proceed)    #to call proceed() function after some time
